@@ -1,0 +1,18 @@
+[Unit]
+Description=Immich backup to USB
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/Developer/immich-backup/backup.sh
+TimeoutStartSec=3h
+Nice=10
+IOSchedulingClass=idle
+
+# Environment for desktop notifications
+Environment=DISPLAY=:0
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/%U/bus
+
+[Install]
+WantedBy=default.target
