@@ -187,7 +187,7 @@ async def _query_rdap(
 async def verify_available_domains(
     dns_results: list[DomainResult],
     rate_limit: int = DEFAULT_RATE_LIMIT,
-    on_result: Callable | None = None,
+    on_result: Callable[[RdapResult], None] | None = None,
 ) -> list[DomainResult]:
     """Verify domains flagged as 'possibly available' using RDAP.
 
