@@ -121,7 +121,8 @@
         "README with usage instructions"
       ],
       "priority": 8,
-      "passes": false
+      "passes": true,
+      "inProgress": false
     }
   ]
 }
