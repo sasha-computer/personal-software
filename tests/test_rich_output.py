@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from domain_search.cli import STATUS_STYLES, display_results
 from domain_search.dns_checker import DomainResult, DomainStatus
+from domain_search.types import DomainMetaMap
 
 from .conftest import _capture_console
 
@@ -34,7 +35,7 @@ def test_display_table_hack_columns():
         DomainResult("kosti.ck", DomainStatus.AVAILABLE),
         DomainResult("sasha.com", DomainStatus.REGISTERED),
     ]
-    meta = {
+    meta: DomainMetaMap = {
         "kosti.ck": {"type": "hack", "visual": "kostick"},
         "sasha.com": {"type": "exact", "visual": ""},
     }

@@ -2,10 +2,13 @@
 
 import csv
 import json
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TypedDict
 
 from domain_search.dns_checker import DomainResult
+from domain_search.types import CheckMethod, DomainKind, DomainMeta, DomainMetaMap
 
 FIELD_DOMAIN = "domain"
 FIELD_STATUS = "status"
@@ -21,10 +24,18 @@ EXPORT_FIELDS = (
 )
 
 
+class ExportRow(TypedDict):
+    domain: str
+    status: str
+    check_method: CheckMethod
+    type: DomainKind
+    timestamp: str
+
+
 def export_results(
     results: list[DomainResult],
     output_path: str,
-    domain_meta: dict[str, dict] | None = None,
+    domain_meta: DomainMetaMap | None = None,
 ) -> None:
     """Export results to a file. Format is auto-detected from extension.
 
@@ -49,7 +60,7 @@ def export_results(
         raise ValueError(f"Unsupported file format '{ext}'. Use .json, .jsonl, or .csv.")
 
 
-def _build_row(result: DomainResult, domain_meta: dict[str, dict] | None) -> dict:
+def _build_row(result: DomainResult, domain_meta: Mapping[str, DomainMeta] | None) -> ExportRow:
     """Build a single export row from a DomainResult."""
     meta = (domain_meta or {}).get(result.domain, {})
     return {
@@ -64,7 +75,7 @@ def _build_row(result: DomainResult, domain_meta: dict[str, dict] | None) -> dic
 def _export_json(
     results: list[DomainResult],
     path: Path,
-    domain_meta: dict[str, dict] | None,
+    domain_meta: Mapping[str, DomainMeta] | None,
 ) -> None:
     """Export results as JSON."""
     rows = [_build_row(r, domain_meta) for r in results]
@@ -74,7 +85,7 @@ def _export_json(
 def _export_jsonl(
     results: list[DomainResult],
     path: Path,
-    domain_meta: dict[str, dict] | None,
+    domain_meta: Mapping[str, DomainMeta] | None,
 ) -> None:
     """Export results as JSONL (JSON Lines)."""
     lines = [json.dumps(_build_row(r, domain_meta)) for r in results]
@@ -84,7 +95,7 @@ def _export_jsonl(
 def _export_csv(
     results: list[DomainResult],
     path: Path,
-    domain_meta: dict[str, dict] | None,
+    domain_meta: Mapping[str, DomainMeta] | None,
 ) -> None:
     """Export results as CSV."""
     fieldnames = list(EXPORT_FIELDS)

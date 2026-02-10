@@ -11,8 +11,9 @@ from rich.text import Text
 from domain_search.dns_checker import DomainResult, DomainStatus, check_domains
 from domain_search.exporter import export_results
 from domain_search.hack_generator import generate_domain_hacks
-from domain_search.rdap_checker import verify_available_domains
+from domain_search.rdap_checker import RdapResult, verify_available_domains
 from domain_search.tld_list import fetch_tld_list
+from domain_search.types import DomainMetaMap
 
 console = Console()
 
@@ -52,7 +53,7 @@ def _create_progress(label: str, *, output_console: Console) -> Progress:
 
 def display_results(
     results: list[DomainResult],
-    domain_meta: dict[str, dict] | None = None,
+    domain_meta: DomainMetaMap | None = None,
     output_console: Console | None = None,
 ) -> None:
     """Display results to the terminal using rich.
@@ -163,7 +164,7 @@ def main() -> None:
 
     # Build the list of domains to check and metadata for display
     all_domains: list[str] = []
-    domain_meta: dict[str, dict] = {}
+    domain_meta: DomainMetaMap = {}
 
     # Exact search: term.{tld}
     exact_domains = generate_domains(args.term, tlds)
@@ -206,7 +207,7 @@ def main() -> None:
             with _create_progress("Verifying via RDAP", output_console=console) as progress:
                 rdap_task = progress.add_task("rdap", total=available_count)
 
-                def on_rdap_result(rdap_result) -> None:
+                def on_rdap_result(rdap_result: RdapResult) -> None:
                     progress.advance(rdap_task)
 
                 results = asyncio.run(verify_available_domains(results, on_result=on_rdap_result))

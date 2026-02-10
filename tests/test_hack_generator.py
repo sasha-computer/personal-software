@@ -11,6 +11,7 @@ from domain_search.hack_generator import (
     find_suffix_hacks,
     generate_domain_hacks,
 )
+from domain_search.types import DomainMetaMap
 
 from .conftest import _capture_console
 
@@ -213,7 +214,7 @@ def test_display_results_with_hack_metadata():
         DomainResult("kosti.ck", DomainStatus.AVAILABLE),
         DomainResult("sasha.com", DomainStatus.REGISTERED),
     ]
-    meta = {
+    meta: DomainMetaMap = {
         "kosti.ck": {"type": "hack", "visual": "kostick"},
         "sasha.com": {"type": "exact", "visual": ""},
     }
