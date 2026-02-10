@@ -25,6 +25,8 @@
 - CLI tests that call `main()` must patch `main.console` with a test Console writing to `io.StringIO`
 - `STATUS_STYLES` dict maps `DomainStatus` → rich style strings (green/red/yellow)
 - `_capture_console()` helper in tests creates `Console(file=buf, force_terminal=True, width=120)` for capturing rich output
+- `export_results(results, path, domain_meta)` in `domain_search/exporter.py` — auto-detects .json/.csv from extension
+- `domain_meta` dict carries `check_method` key ("DNS" or "RDAP") for export; set by main() after RDAP verification
 
 ---
 
@@ -129,4 +131,25 @@
   - `display_results` DI pattern: `output_console` parameter for unit tests, `main.console` patching for integration tests
   - Removed `sys` import from `main.py` since `sys.stdout.write` progress was replaced by rich `Progress`
   - `STATUS_STYLES` dict centralizes color mapping, making it easy to test and modify
+---
+
+## 2026-02-10 - US-007
+- Implemented export functionality in `domain_search/exporter.py`
+- `export_results()` auto-detects format from file extension (.json or .csv)
+- JSON export: array of objects with indent=2 formatting
+- CSV export: DictWriter with header row
+- Each row includes: domain, status, check_method (DNS/RDAP), type (exact/hack), timestamp (ISO 8601 UTC)
+- Added `--output FILE` CLI flag to `main.py`
+- RDAP-verified domains tracked via `check_method` key in `domain_meta` dict
+- Default check_method is "DNS" when no meta provided
+- Raises `ValueError` for unsupported file extensions
+- 22 new tests in `tests/test_exporter.py` covering JSON export, CSV export, format detection, and CLI integration
+- All 108 tests pass (22 new for US-007)
+- Files changed: `domain_search/exporter.py`, `main.py`, `tests/test_exporter.py`, `progress.md`, `prd.json`
+- **Learnings for future iterations:**
+  - `_build_row()` helper centralizes row construction for both JSON and CSV exporters
+  - `domain_meta` dict serves dual purpose: display enrichment (type/visual) and export metadata (check_method)
+  - `rdap_checked` set in `main()` tracks which domains went through RDAP verification for accurate check_method reporting
+  - `tmp_path` pytest fixture is ideal for file export tests — auto-cleaned, isolated per test
+  - Case-insensitive extension matching via `.suffix.lower()` handles `.JSON`, `.CSV` etc.
 ---

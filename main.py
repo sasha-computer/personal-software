@@ -12,6 +12,7 @@ from domain_search.tld_list import fetch_tld_list
 from domain_search.dns_checker import DomainStatus, DomainResult, check_domains
 from domain_search.hack_generator import generate_domain_hacks, DomainHack
 from domain_search.rdap_checker import verify_available_domains
+from domain_search.exporter import export_results
 
 console = Console()
 
@@ -115,6 +116,11 @@ def main() -> None:
         action="store_true",
         help="Skip RDAP verification of available domains (faster but less accurate)",
     )
+    parser.add_argument(
+        "--output",
+        metavar="FILE",
+        help="Export results to a file (supports .json and .csv)",
+    )
     args = parser.parse_args()
 
     if not args.term and not args.hack:
@@ -167,9 +173,11 @@ def main() -> None:
         )
 
     # RDAP verification of "possibly available" domains
+    rdap_checked: set[str] = set()
     if not args.skip_rdap:
         available_count = sum(1 for r in results if r.status == DomainStatus.AVAILABLE)
         if available_count > 0:
+            rdap_checked = {r.domain for r in results if r.status == DomainStatus.AVAILABLE}
             with Progress(
                 TextColumn("[bold blue]Verifying via RDAP"),
                 BarColumn(),
@@ -186,7 +194,17 @@ def main() -> None:
                     verify_available_domains(results, on_result=on_rdap_result)
                 )
 
+    # Track check method in domain_meta for export
+    for d in rdap_checked:
+        if d in domain_meta:
+            domain_meta[d]["check_method"] = "RDAP"
+
     display_results(results, domain_meta)
+
+    # Export results if --output specified
+    if args.output:
+        export_results(results, args.output, domain_meta)
+        console.print(f"Results exported to {args.output}")
 
 
 if __name__ == "__main__":

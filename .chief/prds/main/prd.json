@@ -106,7 +106,8 @@
         "Exported data includes: domain, status, check method (DNS/RDAP), type (exact/hack), timestamp"
       ],
       "priority": 7,
-      "passes": false
+      "passes": true,
+      "inProgress": false
     },
     {
       "id": "US-008",
