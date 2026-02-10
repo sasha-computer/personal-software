@@ -13,6 +13,11 @@ dependencies = [
 [project.scripts]
 domain-search = "domain_search.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/sasha-computer/domain-search"
+Repository = "https://github.com/sasha-computer/domain-search"
+Issues = "https://github.com/sasha-computer/domain-search/issues"
+
 [tool.uv]
 package = true
 
