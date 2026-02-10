@@ -44,7 +44,8 @@
         "Full run completes in under 2 minutes for all TLDs"
       ],
       "priority": 3,
-      "passes": false
+      "passes": true,
+      "inProgress": false
     },
     {
       "id": "US-004",

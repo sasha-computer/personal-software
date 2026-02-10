@@ -1,6 +1,7 @@
 """Async DNS availability checker for domain names."""
 
 import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 
@@ -51,12 +52,14 @@ async def check_domain(domain: str, resolver: dns.asyncresolver.Resolver) -> Dom
 async def check_domains(
     domains: list[str],
     concurrency: int = DEFAULT_CONCURRENCY,
+    on_result: Callable[[DomainResult], None] | None = None,
 ) -> list[DomainResult]:
     """Check multiple domains concurrently with a configurable concurrency limit.
 
     Args:
         domains: List of domain names to check (e.g. ["sasha.io", "sasha.dev"]).
         concurrency: Maximum number of concurrent DNS lookups.
+        on_result: Optional callback invoked after each domain is checked.
 
     Returns:
         A list of DomainResult objects, one per input domain.
@@ -66,11 +69,13 @@ async def check_domains(
     resolver.lifetime = DNS_TIMEOUT
 
     semaphore = asyncio.Semaphore(concurrency)
-    results: list[DomainResult] = []
 
     async def _check_with_limit(domain: str) -> DomainResult:
         async with semaphore:
-            return await check_domain(domain, resolver)
+            result = await check_domain(domain, resolver)
+            if on_result is not None:
+                on_result(result)
+            return result
 
     tasks = [asyncio.create_task(_check_with_limit(d)) for d in domains]
     results = await asyncio.gather(*tasks)

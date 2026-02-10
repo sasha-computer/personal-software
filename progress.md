@@ -6,6 +6,10 @@
 - Async tests use `@pytest.mark.asyncio` with `AsyncMock` for async resolver mocking
 - DNS checker uses `dns.asyncresolver.Resolver` with `asyncio.Semaphore` for concurrency control
 - Run tests with `uv run pytest tests/ -v`
+- CLI accepts positional `term` arg and optional `--concurrency` flag via argparse
+- `check_domains` supports `on_result` callback for progress tracking
+- `generate_domains()` in `main.py` creates `{term}.{tld}` for all TLDs
+- `sort_results()` sorts by status (available > unknown > registered), then alphabetically
 
 ---
 
@@ -33,4 +37,19 @@
   - `dns.resolver.LifetimeTimeout` is a separate exception from `dns.exception.Timeout` — catch both for robust timeout handling
   - `dnspython` async resolver: use `resolver.resolve(domain, rdtype)` with await
   - `DomainStatus` enum and `DomainResult` dataclass provide clean typed results for downstream consumers (US-003, US-005, US-006)
+---
+
+## 2026-02-10 - US-003
+- Implemented CLI argument parsing via `argparse` (positional `term`, optional `--concurrency`)
+- Added `generate_domains(term, tlds)` to create `{term}.{tld}` for every TLD
+- Added `sort_results()` to sort by status (available first, then unknown, then registered) then alphabetically
+- Added `on_result` callback parameter to `check_domains()` for live progress updates
+- Progress indicator shows `Checking N domains... [X/N]` with carriage-return updates
+- Results displayed with summary: total, available, registered, unknown counts
+- Files changed: `main.py`, `domain_search/dns_checker.py`, `tests/test_search.py`, `progress.md`, `prd.json`
+- **Learnings for future iterations:**
+  - `check_domains` `on_result` callback enables progress tracking without coupling display to DNS logic
+  - For CLI tests, mock both `fetch_tld_list` and `check_domains` at the `main` module level (not at `domain_search.*`)
+  - `sys.stdout.write` with `\r` provides simple progress indicator without needing `rich` (US-006 will upgrade)
+  - `argparse` positional arg for `term` means `--hack` flag can be added later (US-004) without breaking existing interface
 ---
