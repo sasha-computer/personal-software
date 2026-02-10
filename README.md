@@ -1,8 +1,10 @@
 # Domain Search
 
-Search for available domains across basically every TLD before you buy domain number 48.
+![domain-search CLI demo](assets/domain-search-demo.gif)
 
-No API keys, no paid service, just DNS + RDAP checks in a fast CLI.
+- Search for available domains across basically every TLD. 
+- No API keys, no paid service required. 
+- This tool uses DNS + RDAP checks in a fast CLI.
 
 ## Quick Start
 
@@ -10,9 +12,11 @@ Requirements:
 - Python 3.12+
 - [uv](https://docs.astral.sh/uv/)
 
-Run instantly (no install):
+First run instantly (no install):
 
 ```bash
+git clone https://github.com/sasha-computer/domain-search
+cd domain-search
 uvx domain-search creative
 ```
 
@@ -79,13 +83,3 @@ cd domain-search
 uv sync
 uv run domain-search creative
 ```
-
-## Demo GIF Idea
-
-A short terminal GIF in the README would help a lot. Recommended flow:
-
-1. Run `domain-search creative --tld com io dev ve --output demo.json`.
-2. Show the output table and exported file line.
-3. Keep it 8-12 seconds, cropped to terminal only.
-
-Tools that work well: `asciinema` + `agg`, or `vhs`.
