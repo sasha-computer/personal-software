@@ -7,6 +7,19 @@ from pathlib import Path
 
 from domain_search.dns_checker import DomainResult
 
+FIELD_DOMAIN = "domain"
+FIELD_STATUS = "status"
+FIELD_CHECK_METHOD = "check_method"
+FIELD_TYPE = "type"
+FIELD_TIMESTAMP = "timestamp"
+EXPORT_FIELDS = (
+    FIELD_DOMAIN,
+    FIELD_STATUS,
+    FIELD_CHECK_METHOD,
+    FIELD_TYPE,
+    FIELD_TIMESTAMP,
+)
+
 
 def export_results(
     results: list[DomainResult],
@@ -40,11 +53,11 @@ def _build_row(result: DomainResult, domain_meta: dict[str, dict] | None) -> dic
     """Build a single export row from a DomainResult."""
     meta = (domain_meta or {}).get(result.domain, {})
     return {
-        "domain": result.domain,
-        "status": result.status.value,
-        "check_method": meta.get("check_method", "DNS"),
-        "type": meta.get("type", "exact"),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        FIELD_DOMAIN: result.domain,
+        FIELD_STATUS: result.status.value,
+        FIELD_CHECK_METHOD: meta.get("check_method", "DNS"),
+        FIELD_TYPE: meta.get("type", "exact"),
+        FIELD_TIMESTAMP: datetime.now(timezone.utc).isoformat(),
     }
 
 
@@ -74,7 +87,7 @@ def _export_csv(
     domain_meta: dict[str, dict] | None,
 ) -> None:
     """Export results as CSV."""
-    fieldnames = ["domain", "status", "check_method", "type", "timestamp"]
+    fieldnames = list(EXPORT_FIELDS)
     with path.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
