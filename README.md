@@ -1,6 +1,6 @@
 # Domain Search
 
-A Python CLI tool that searches for available domain names across all known TLDs. It supports two modes: **exact search** (e.g., `yourname.computer`, `mysite.dev`) and **domain hack search** (where the TLD forms part of a word, e.g., `creati.ve`, `kosti.ck`). Uses free protocols (DNS lookups and RDAP) requiring no API keys.
+A Python CLI tool that searches for available domain names across all known TLDs. For any given word, it runs both **exact search** (e.g., `creative.dev`, `creative.computer`) and **domain hack search** (where the TLD forms part of the word, e.g., `creati.ve`). Uses free protocols (DNS lookups and RDAP) requiring no API keys.
 
 ## Requirements
 
@@ -17,50 +17,35 @@ uv sync
 
 ## Usage
 
-### Exact Search
-
-Search for `<word>.{tld}` across all known TLDs:
-
 ```bash
-uv run python main.py myname
+uv run domain-search <word>
 ```
 
-### Domain Hack Search
-
-Find creative domain hacks where the TLD forms part of a word:
+This searches for `<word>.{tld}` across all known TLDs (exact matches) and also finds domain hacks where the TLD forms part of the word. For example:
 
 ```bash
-uv run python main.py --hack creative
+uv run domain-search creative
 ```
 
-This finds domains like `creati.ve` (reads as "creative").
-
-### Combined Search
-
-Run both exact and hack search together:
-
-```bash
-uv run python main.py myname --hack creative
-```
+Returns exact matches like `creative.com`, `creative.dev` as well as hacks like `creati.ve` (reads as "creative").
 
 ### Options
 
 | Flag | Description |
 |------|-------------|
-| `--hack WORD` | Find domain hacks for the given word |
 | `--concurrency N` | Max concurrent DNS lookups (default: 50) |
 | `--skip-rdap` | Skip RDAP verification (faster but less accurate) |
 | `--output FILE` | Export results to `.json`, `.jsonl`, or `.csv` file |
-| `--tld TLD [TLD ...]` | Filter to specific TLDs (e.g., `--tld com io`) |
+| `--tld TLD [TLD ...]` | Filter to specific TLDs (e.g., `--tld com io ve`) |
 
 ### Export Results
 
 Export to JSON, JSONL, or CSV (format auto-detected from file extension):
 
 ```bash
-uv run python main.py myname --output results.json
-uv run python main.py myname --output results.jsonl
-uv run python main.py myname --output results.csv
+uv run domain-search creative --output results.json
+uv run domain-search creative --output results.jsonl
+uv run domain-search creative --output results.csv
 ```
 
 ## How It Works
@@ -74,4 +59,26 @@ uv run python main.py myname --output results.csv
 
 ```bash
 uv run pytest tests/ -v
+```
+
+## Special Contributions
+
+This project benefits from ideas and workflows inspired by Chief:
+
+https://github.com/MiniCodeMonkey/chief/tree/main
+
+If you are exploring that ecosystem, try this easter egg:
+
+```bash
+chief wiggum
+```
+
+Tiny Ralph cameo:
+
+```text
+  _.-._
+ (o.o )
+  |=|   "I choo-choo-choose domains!"
+ __|__
+/_____\
 ```
