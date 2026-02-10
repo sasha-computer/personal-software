@@ -1,0 +1,121 @@
+{
+  "project": "Domain Search: Find the Perfect \"Sasha\" Domain",
+  "description": "A Python CLI tool (managed with uv) that searches for available domain names across all known TLDs. The tool has two modes: exact search (e.g., sasha.computer, sasha.dev) and domain hack search (where the TLD forms part of a word, e.g., a surname ending in .ck). It uses free protocols (DNS lookups and RDAP) requiring no API keys.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Fetch Complete TLD List",
+      "description": "As a user, I want the tool to know about every public TLD so that no potential domain is missed.",
+      "acceptanceCriteria": [
+        "Fetches the current TLD list from IANA (https://data.iana.org/TLD/tlds-alpha-by-domain.txt)",
+        "Caches the TLD list locally so repeated runs don't re-download",
+        "Parses the list correctly (skips comment lines, handles IDN/punycode TLDs)",
+        "Reports the total number of TLDs found (should be ~1,500+)"
+      ],
+      "priority": 1,
+      "passes": true,
+      "inProgress": false
+    },
+    {
+      "id": "US-002",
+      "title": "Check Domain Availability via DNS",
+      "description": "As a user, I want to check if a domain is available by querying DNS so that I get fast results without needing an API key.",
+      "acceptanceCriteria": [
+        "For a given domain (e.g., sasha.io), performs a DNS lookup for NS and SOA records",
+        "Classifies domains as \"registered\" (has records) or \"possibly available\" (NXDOMAIN / no records)",
+        "Handles DNS timeouts gracefully (marks as \"unknown\" rather than crashing)",
+        "Uses async DNS resolution for concurrent lookups (not one-at-a-time)",
+        "Respects a configurable concurrency limit to avoid flooding DNS servers (default: 50 concurrent)"
+      ],
+      "priority": 2,
+      "passes": false
+    },
+    {
+      "id": "US-003",
+      "title": "Search \"sasha.{tld}\" Across All TLDs",
+      "description": "As a user, I want to search for sasha combined with every known TLD so that I can see all my options.",
+      "acceptanceCriteria": [
+        "Accepts a search term via CLI argument (e.g., python main.py sasha)",
+        "Generates {term}.{tld} for every TLD in the list",
+        "Checks availability for each generated domain",
+        "Shows a progress indicator (e.g., \"Checking 1,524 domains...\" with a progress bar)",
+        "Displays results sorted by availability status, then alphabetically",
+        "Full run completes in under 2 minutes for all TLDs"
+      ],
+      "priority": 3,
+      "passes": false
+    },
+    {
+      "id": "US-004",
+      "title": "Domain Hack Generator",
+      "description": "As a user, I want the tool to find \"domain hacks\" where the TLD forms part of a word so that I can discover creative domain options.",
+      "acceptanceCriteria": [
+        "Given a word (e.g., a full name or surname), finds all TLDs that match the end of the word",
+        "For example, if the word is \"kostick\" and .ck is a TLD, suggests kosti.ck",
+        "Also finds TLDs that appear anywhere within the word for more creative splits (e.g., sa.sh if .sh existed in context of \"sasha\")",
+        "Activated via a --hack flag with the target word: python main.py --hack kostick",
+        "Can combine with exact search: python main.py sasha --hack lastname",
+        "Shows the \"visual\" reading of the domain (e.g., kosti.ck reads as \"kostick\")"
+      ],
+      "priority": 4,
+      "passes": false
+    },
+    {
+      "id": "US-005",
+      "title": "RDAP Availability Verification",
+      "description": "As a user, I want to verify \"possibly available\" domains using RDAP so that I get more confident results.",
+      "acceptanceCriteria": [
+        "For domains flagged as \"possibly available\" by DNS, performs an RDAP query for confirmation",
+        "Uses the IANA RDAP bootstrap to find the correct RDAP server for each TLD",
+        "Handles TLDs that don't have RDAP servers (falls back to DNS-only result)",
+        "Reports registration status from RDAP when available (registered, available, reserved)",
+        "Enabled by default but can be skipped with --skip-rdap for faster results",
+        "Rate-limits RDAP queries to avoid being blocked (max 10/second)"
+      ],
+      "priority": 5,
+      "passes": false
+    },
+    {
+      "id": "US-006",
+      "title": "Rich Terminal Output",
+      "description": "As a user, I want clear, well-formatted terminal output so that results are easy to scan and act on.",
+      "acceptanceCriteria": [
+        "Uses rich library for formatted terminal output",
+        "Shows a live progress bar during scanning",
+        "Results displayed in a table with columns: Domain, Status, Type (exact/hack), Visual Reading (for hacks)",
+        "Color-coded status: green for available, red for taken, yellow for unknown",
+        "Summary at the end: total checked, available count, taken count, unknown count",
+        "Available domains are highlighted/grouped at the top for easy scanning"
+      ],
+      "priority": 6,
+      "passes": false
+    },
+    {
+      "id": "US-007",
+      "title": "Export Results",
+      "description": "As a user, I want to export results to a file so that I can review them later or share them.",
+      "acceptanceCriteria": [
+        "--output results.json flag exports results as JSON",
+        "--output results.csv flag exports results as CSV",
+        "Format is auto-detected from file extension",
+        "Exported data includes: domain, status, check method (DNS/RDAP), type (exact/hack), timestamp"
+      ],
+      "priority": 7,
+      "passes": false
+    },
+    {
+      "id": "US-008",
+      "title": "Project Setup with UV",
+      "description": "As a developer, I want the project properly set up with uv so that dependencies are managed and the tool is easy to run.",
+      "acceptanceCriteria": [
+        "Project initialized with uv init",
+        "pyproject.toml with all dependencies declared (dnspython, httpx, rich)",
+        "Can be run with uv run python main.py sasha",
+        "Python 3.12+ required",
+        "README with usage instructions"
+      ],
+      "priority": 8,
+      "passes": false
+    }
+  ]
+}
