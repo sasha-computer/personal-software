@@ -15,6 +15,11 @@
 - CLI `--hack WORD` flag can be combined with positional `term` for both exact + hack search
 - `domain_meta` dict in `main.py` maps domain → `{"type": "exact"|"hack", "visual": str}` for enriched display
 - `display_results` auto-detects hack mode and adds Type/Visual Reading columns when hacks are present
+- RDAP bootstrap cached at `~/.cache/domain-search/rdap_bootstrap.json` with 1-day expiry
+- `verify_available_domains()` takes DNS results and re-checks "possibly available" domains via RDAP
+- RDAP rate limiting via `_RateLimiter` token-bucket (default 10/sec)
+- `--skip-rdap` flag bypasses RDAP verification for faster results
+- When adding new pipeline steps (like RDAP), existing CLI tests that call `main()` must mock the new step too
 
 ---
 
@@ -76,4 +81,25 @@
   - `domain_meta` dict enriches DNS results without modifying `DomainResult` dataclass — keeps dns_checker independent
   - Changed `term` from required positional to `nargs="?"` optional, with custom validation `parser.error()` if neither term nor --hack provided
   - The `DomainHack` dataclass carries both `domain` (e.g., "kosti.ck") and `visual` (e.g., "kostick")
+---
+
+## 2026-02-10 - US-005
+- Implemented RDAP availability verification in `domain_search/rdap_checker.py`
+- Fetches IANA RDAP bootstrap (`https://data.iana.org/rdap/dns.json`) to map TLDs → RDAP server URLs
+- Caches bootstrap locally at `~/.cache/domain-search/rdap_bootstrap.json` with 1-day expiry
+- For "possibly available" domains, queries RDAP: HTTP 200 = registered, HTTP 404 = available, error = unknown
+- Classifies RDAP responses by status array: "active"/locks → registered, "reserved" → registered, no data → registered
+- Handles TLDs without RDAP servers gracefully (keeps DNS-only result)
+- Token-bucket rate limiter (`_RateLimiter`) limits to 10 RDAP queries/second
+- `--skip-rdap` CLI flag skips RDAP verification for faster results
+- RDAP enabled by default with progress indicator during verification
+- Updated existing CLI tests in `test_search.py` and `test_hack_generator.py` to mock `verify_available_domains`
+- Files changed: `domain_search/rdap_checker.py`, `main.py`, `tests/test_rdap_checker.py`, `tests/test_search.py`, `tests/test_hack_generator.py`, `progress.md`, `prd.json`
+- **Learnings for future iterations:**
+  - Use `Callable` from `collections.abc`, not `callable` (builtin) for type hints with `|` union syntax
+  - IANA RDAP bootstrap format: `{"services": [[tld_list, url_list], ...]}` — prefer HTTPS URLs, ensure trailing slash
+  - RDAP domain query: GET `{rdap_url}domain/{domain}` — 200 = exists, 404 = not found
+  - When adding new pipeline steps to `main()`, all existing CLI tests calling `main()` need to mock the new function
+  - `httpx.AsyncClient` context manager mocking requires both `__aenter__` and `__aexit__` AsyncMock
+  - Token-bucket rate limiter pattern: track tokens + last refill time, refill based on elapsed time, sleep when empty
 ---

@@ -117,9 +117,13 @@ def test_main_accepts_cli_argument(capsys):
                 on_result(r)
         return mock_results
 
+    async def mock_verify(dns_results, rate_limit=10, on_result=None):
+        return dns_results
+
     with (
         patch("main.fetch_tld_list", return_value=["com", "xyz"]),
         patch("main.check_domains", side_effect=mock_check_domains),
+        patch("main.verify_available_domains", side_effect=mock_verify),
         patch("sys.argv", ["main.py", "test"]),
     ):
         main()

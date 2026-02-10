@@ -7,6 +7,7 @@ import sys
 from domain_search.tld_list import fetch_tld_list
 from domain_search.dns_checker import DomainStatus, DomainResult, check_domains
 from domain_search.hack_generator import generate_domain_hacks, DomainHack
+from domain_search.rdap_checker import verify_available_domains
 
 
 def generate_domains(term: str, tlds: list[str]) -> list[str]:
@@ -77,6 +78,11 @@ def main() -> None:
         default=50,
         help="Max concurrent DNS lookups (default: 50)",
     )
+    parser.add_argument(
+        "--skip-rdap",
+        action="store_true",
+        help="Skip RDAP verification of available domains (faster but less accurate)",
+    )
     args = parser.parse_args()
 
     if not args.term and not args.hack:
@@ -127,6 +133,30 @@ def main() -> None:
     # Clear the progress line
     sys.stdout.write("\r" + " " * 60 + "\r")
     sys.stdout.flush()
+
+    # RDAP verification of "possibly available" domains
+    if not args.skip_rdap:
+        available_count = sum(1 for r in results if r.status == DomainStatus.AVAILABLE)
+        if available_count > 0:
+            rdap_checked = 0
+
+            def on_rdap_result(rdap_result) -> None:
+                nonlocal rdap_checked
+                rdap_checked += 1
+                sys.stdout.write(
+                    f"\rVerifying {available_count:,} available domains via RDAP... "
+                    f"[{rdap_checked:,}/{available_count:,}]"
+                )
+                sys.stdout.flush()
+
+            print(f"Verifying {available_count:,} available domains via RDAP...")
+            results = asyncio.run(
+                verify_available_domains(results, on_result=on_rdap_result)
+            )
+
+            # Clear the RDAP progress line
+            sys.stdout.write("\r" + " " * 80 + "\r")
+            sys.stdout.flush()
 
     display_results(results, domain_meta)
 
