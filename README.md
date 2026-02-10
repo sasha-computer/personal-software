@@ -93,7 +93,7 @@ Run linting, formatting, and type checking locally:
 ```bash
 uv run ruff check .
 uv run ruff format .
-uv run ty check
+uv run ty check --error-on-warning
 ```
 
 Install and run pre-commit hooks:
