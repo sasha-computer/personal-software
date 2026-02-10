@@ -119,7 +119,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         metavar="FILE",
-        help="Export results to a file (supports .json and .csv)",
+        help="Export results to a file (supports .json, .jsonl, and .csv)",
     )
     args = parser.parse_args()
 

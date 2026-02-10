@@ -110,6 +110,59 @@ class TestExportJSON:
             assert row["check_method"] == "DNS"
 
 
+class TestExportJSONL:
+    def test_export_jsonl_creates_file(self, tmp_path, sample_results):
+        out = tmp_path / "results.jsonl"
+        export_results(sample_results, str(out))
+        assert out.exists()
+
+    def test_export_jsonl_valid_format(self, tmp_path, sample_results):
+        """Each line should be a valid JSON object."""
+        out = tmp_path / "results.jsonl"
+        export_results(sample_results, str(out))
+        lines = out.read_text().strip().split("\n")
+        assert len(lines) == 3
+        for line in lines:
+            data = json.loads(line)
+            assert isinstance(data, dict)
+
+    def test_export_jsonl_contains_required_fields(self, tmp_path, sample_results, sample_meta):
+        out = tmp_path / "results.jsonl"
+        export_results(sample_results, str(out), sample_meta)
+        lines = out.read_text().strip().split("\n")
+        required_fields = {"domain", "status", "check_method", "type", "timestamp"}
+        for line in lines:
+            row = json.loads(line)
+            assert set(row.keys()) == required_fields
+
+    def test_export_jsonl_domain_values(self, tmp_path, sample_results, sample_meta):
+        out = tmp_path / "results.jsonl"
+        export_results(sample_results, str(out), sample_meta)
+        lines = out.read_text().strip().split("\n")
+        domains = [json.loads(line)["domain"] for line in lines]
+        assert "sasha.com" in domains
+        assert "sasha.xyz" in domains
+        assert "sasha.zzz" in domains
+
+    def test_export_jsonl_status_values(self, tmp_path, sample_results):
+        out = tmp_path / "results.jsonl"
+        export_results(sample_results, str(out))
+        lines = out.read_text().strip().split("\n")
+        statuses = {json.loads(line)["domain"]: json.loads(line)["status"] for line in lines}
+        assert statuses["sasha.com"] == "registered"
+        assert statuses["sasha.xyz"] == "possibly available"
+        assert statuses["sasha.zzz"] == "unknown"
+
+    def test_export_jsonl_check_method(self, tmp_path, sample_results, sample_meta):
+        out = tmp_path / "results.jsonl"
+        export_results(sample_results, str(out), sample_meta)
+        lines = out.read_text().strip().split("\n")
+        methods = {json.loads(line)["domain"]: json.loads(line)["check_method"] for line in lines}
+        assert methods["sasha.com"] == "DNS"
+        assert methods["sasha.xyz"] == "RDAP"
+        assert methods["sasha.zzz"] == "DNS"
+
+
 class TestExportCSV:
     def test_export_csv_creates_file(self, tmp_path, sample_results):
         out = tmp_path / "results.csv"
@@ -164,6 +217,15 @@ class TestFormatDetection:
         data = json.loads(out.read_text())
         assert isinstance(data, list)
 
+    def test_jsonl_extension_detected(self, tmp_path, sample_results):
+        out = tmp_path / "output.jsonl"
+        export_results(sample_results, str(out))
+        lines = out.read_text().strip().split("\n")
+        assert len(lines) == 3
+        for line in lines:
+            data = json.loads(line)
+            assert isinstance(data, dict)
+
     def test_csv_extension_detected(self, tmp_path, sample_results):
         out = tmp_path / "output.csv"
         export_results(sample_results, str(out))
@@ -174,6 +236,12 @@ class TestFormatDetection:
     def test_unsupported_extension_raises(self, tmp_path, sample_results):
         out = tmp_path / "output.txt"
         with pytest.raises(ValueError, match="Unsupported file format"):
+            export_results(sample_results, str(out))
+
+    def test_unsupported_extension_mentions_jsonl(self, tmp_path, sample_results):
+        """Error message should mention .jsonl as a supported format."""
+        out = tmp_path / "output.txt"
+        with pytest.raises(ValueError, match=r"\.jsonl"):
             export_results(sample_results, str(out))
 
     def test_case_insensitive_extension(self, tmp_path, sample_results):

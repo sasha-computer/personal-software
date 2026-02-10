@@ -17,21 +17,23 @@ def export_results(
 
     Args:
         results: List of DomainResult objects.
-        output_path: Path to output file (.json or .csv).
+        output_path: Path to output file (.json, .jsonl, or .csv).
         domain_meta: Optional dict mapping domain -> {"type": "exact"|"hack", "visual": str}.
 
     Raises:
-        ValueError: If the file extension is not .json or .csv.
+        ValueError: If the file extension is not .json, .jsonl, or .csv.
     """
     path = Path(output_path)
     ext = path.suffix.lower()
 
     if ext == ".json":
         _export_json(results, path, domain_meta)
+    elif ext == ".jsonl":
+        _export_jsonl(results, path, domain_meta)
     elif ext == ".csv":
         _export_csv(results, path, domain_meta)
     else:
-        raise ValueError(f"Unsupported file format '{ext}'. Use .json or .csv.")
+        raise ValueError(f"Unsupported file format '{ext}'. Use .json, .jsonl, or .csv.")
 
 
 def _build_row(result: DomainResult, domain_meta: dict[str, dict] | None) -> dict:
@@ -54,6 +56,16 @@ def _export_json(
     """Export results as JSON."""
     rows = [_build_row(r, domain_meta) for r in results]
     path.write_text(json.dumps(rows, indent=2) + "\n")
+
+
+def _export_jsonl(
+    results: list[DomainResult],
+    path: Path,
+    domain_meta: dict[str, dict] | None,
+) -> None:
+    """Export results as JSONL (JSON Lines)."""
+    lines = [json.dumps(_build_row(r, domain_meta)) for r in results]
+    path.write_text("\n".join(lines) + "\n")
 
 
 def _export_csv(
