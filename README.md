@@ -5,8 +5,8 @@ Automated weekly backup of Immich photos from NAS to LUKS-encrypted USB drive.
 ## Architecture
 
 ```
-NAS (192.168.50.235)          Local Machine              USB (LUKS encrypted)
-/mnt/user/immichphotos/  -->  ~/Documents/immich-stage/  -->  /run/media/sasha/<label>/
+NAS (192.168.x.x)          Local Machine              USB (LUKS encrypted)
+/mnt/user/immichphotos/  -->  ~/Documents/immich-stage/  -->  /run/media/<user>/<label>/
                                    (tar here)                  immich-backups/
 ```
 
@@ -45,11 +45,11 @@ Per Immich documentation, all essential directories:
 Edit the top of `backup.sh` to customize:
 
 ```bash
-NAS_IP="192.168.50.235"          # Local network IP
+NAS_IP="192.168.x.x"          # Local network IP
 NAS_TAILSCALE="nas"               # Tailscale hostname
 IMMICH_PATH="/mnt/user/immichphotos"
 LOCAL_STAGE="$HOME/Documents/immich-stage"
-USB_SEARCH_PATH="/run/media/sasha"
+USB_SEARCH_PATH="/run/media/<user>"
 BACKUP_SUBDIR="immich-backups"
 MAX_BACKUPS=2                     # Keep N most recent on USB
 MAX_WAIT_MINUTES=30               # Wait for USB before aborting
@@ -57,14 +57,14 @@ MAX_WAIT_MINUTES=30               # Wait for USB before aborting
 
 ## USB Drive Setup
 
-The script searches `/run/media/sasha/` for:
+The script searches `/run/media/<user>/` for:
 1. Any mounted volume containing an `immich-backups/` directory
 2. Or any writable volume with >100GB free (creates the directory)
 
 To prepare a new USB:
 1. Encrypt with LUKS via GNOME Disks or `cryptsetup`
 2. Mount and unlock the drive
-3. Create directory: `mkdir /run/media/sasha/<label>/immich-backups`
+3. Create directory: `mkdir /run/media/<user>/<label>/immich-backups`
 
 ## Backup Process
 
@@ -113,7 +113,7 @@ systemctl --user start immich-backup.service
 ## Network
 
 The script auto-detects the best route to NAS:
-- **At home**: Uses local IP (192.168.50.235)
+- **At home**: Uses local IP (192.168.x.x)
 - **Away**: Uses Tailscale (nas)
 
 ## Restoration
@@ -123,16 +123,16 @@ To restore from backup:
 ```bash
 # Mount and unlock USB drive
 # Extract to desired location
-tar -xvf /run/media/sasha/<label>/immich-backups/immich-backup-YYYYMMDD.tar
+tar -xvf /run/media/<user>/<label>/immich-backups/immich-backup-YYYYMMDD.tar
 
 # Stop Immich on NAS
-ssh root@192.168.50.235 "docker stop immich"
+ssh root@<nas-ip> "docker stop immich"
 
 # Sync back to NAS
-rsync -avz immich-stage/ root@192.168.50.235:/mnt/user/immichphotos/
+rsync -avz immich-stage/ root@<nas-ip>:/mnt/user/immichphotos/
 
 # Start Immich
-ssh root@192.168.50.235 "docker start immich"
+ssh root@<nas-ip> "docker start immich"
 ```
 
 ## Uninstall

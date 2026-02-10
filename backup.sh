@@ -10,11 +10,11 @@ set -euo pipefail
 # Configuration
 # =============================================================================
 
-NAS_IP="192.168.50.235"
+NAS_IP="192.168.x.x"
 NAS_TAILSCALE="nas"
 IMMICH_PATH="/mnt/user/immichphotos"
 LOCAL_STAGE="$HOME/Documents/immich-stage"
-USB_SEARCH_PATH="/run/media/sasha"
+USB_SEARCH_PATH="/run/media/$USER"
 BACKUP_SUBDIR="immich-backups"
 MAX_BACKUPS=2
 MAX_WAIT_MINUTES=30
