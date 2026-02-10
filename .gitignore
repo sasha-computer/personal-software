@@ -1,4 +1,3 @@
-# Python-generated files
 __pycache__/
 *.py[oc]
 build/
@@ -10,9 +9,5 @@ wheels/
 .mypy_cache/
 .coverage
 htmlcov/
-
-# Virtual environments
 .venv
-
-# Local AI workflow artifacts
 .chief/

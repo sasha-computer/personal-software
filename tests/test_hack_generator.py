@@ -1,21 +1,21 @@
 """Tests for US-004: Domain Hack Generator."""
 
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import patch
 
 import pytest
 
+from domain_search.cli import display_results, main
+from domain_search.dns_checker import DomainResult, DomainStatus
 from domain_search.hack_generator import (
-    DomainHack,
-    find_suffix_hacks,
     find_interior_hacks,
+    find_suffix_hacks,
     generate_domain_hacks,
 )
-from domain_search.dns_checker import DomainResult, DomainStatus
-from domain_search.cli import main, display_results
+
 from .conftest import _capture_console
 
-
 # --- find_suffix_hacks ---
+
 
 def test_suffix_hack_finds_matching_tld():
     """kostick ends with ck -> kosti.ck"""
@@ -52,6 +52,7 @@ def test_suffix_hack_visual_reading():
 
 # --- find_interior_hacks ---
 
+
 def test_interior_hack_finds_tld_within_word():
     """sasha contains 'sh' at position 2 -> sa.sh (reads as 'sash')."""
     hacks = find_interior_hacks("sasha", ["sh"])
@@ -80,7 +81,7 @@ def test_interior_hack_tld_at_start():
 
 
 def test_interior_hack_multiple_positions():
-    """Word with TLD appearing in multiple non-suffix positions should only produce unique domains."""
+    """TLD in multiple interior positions should produce unique domains only."""
     # "banana" with tld "an" -> b.an (pos 1), ban.an (pos 3); pos 5 is suffix
     hacks = find_interior_hacks("banana", ["an"])
     domains = [h.domain for h in hacks]
@@ -90,6 +91,7 @@ def test_interior_hack_multiple_positions():
 
 
 # --- generate_domain_hacks ---
+
 
 def test_generate_domain_hacks_combines_suffix_and_interior():
     tlds = ["ck", "os", "st"]
@@ -126,6 +128,7 @@ def test_generate_domain_hacks_no_matches():
 
 
 # --- CLI integration (single-argument runs both exact + hack) ---
+
 
 def test_main_runs_hack_search():
     """main() should find domain hacks from the positional term."""

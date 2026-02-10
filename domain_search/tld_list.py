@@ -1,7 +1,7 @@
 """Fetch and cache the IANA TLD list."""
 
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from datetime import datetime, timedelta, timezone
 
 import httpx
 
@@ -15,8 +15,8 @@ def _cache_is_fresh() -> bool:
     """Check if the cached TLD file exists and is less than CACHE_MAX_AGE old."""
     if not CACHE_FILE.exists():
         return False
-    mtime = datetime.fromtimestamp(CACHE_FILE.stat().st_mtime, tz=timezone.utc)
-    return datetime.now(timezone.utc) - mtime < CACHE_MAX_AGE
+    mtime = datetime.fromtimestamp(CACHE_FILE.stat().st_mtime, tz=UTC)
+    return datetime.now(UTC) - mtime < CACHE_MAX_AGE
 
 
 def _parse_tld_text(text: str) -> list[str]:

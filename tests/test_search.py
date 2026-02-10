@@ -1,14 +1,12 @@
 """Tests for US-003: Search term.{tld} across all TLDs."""
 
-import asyncio
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
-import dns.asyncresolver
-import dns.resolver
 import pytest
 
+from domain_search.cli import display_results, generate_domains, sort_results
 from domain_search.dns_checker import DomainResult, DomainStatus
-from domain_search.cli import generate_domains, sort_results, display_results
+
 from .conftest import _capture_console
 
 
@@ -99,6 +97,7 @@ async def test_on_result_callback_invoked():
         MockResolver.return_value = mock_r
 
         from domain_search.dns_checker import check_domains
+
         results = await check_domains(["a.com", "b.com"], on_result=on_result)
         assert len(callback_calls) == 2
         assert len(results) == 2

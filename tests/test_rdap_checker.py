@@ -1,8 +1,7 @@
 """Tests for US-005: RDAP availability verification."""
 
-import asyncio
 import json
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
@@ -10,19 +9,19 @@ import pytest
 from domain_search.dns_checker import DomainResult, DomainStatus
 from domain_search.rdap_checker import (
     RdapStatus,
-    RdapResult,
-    _parse_bootstrap,
-    _get_tld,
     _classify_rdap_response,
-    _rdap_to_domain_status,
+    _get_tld,
+    _parse_bootstrap,
     _RateLimiter,
+    _rdap_to_domain_status,
     fetch_rdap_bootstrap,
     verify_available_domains,
 )
+
 from .conftest import _capture_console
 
-
 # --- Bootstrap parsing ---
+
 
 def test_parse_bootstrap_basic():
     """Should map TLDs to RDAP URLs from bootstrap JSON."""
@@ -80,6 +79,7 @@ def test_parse_bootstrap_empty_services():
 
 # --- Helper functions ---
 
+
 def test_get_tld():
     assert _get_tld("example.com") == "com"
     assert _get_tld("sasha.co.uk") == "uk"
@@ -128,6 +128,7 @@ def test_rdap_to_domain_status_mapping():
 
 # --- Rate limiter ---
 
+
 @pytest.mark.asyncio
 async def test_rate_limiter_allows_burst():
     """Rate limiter should allow a burst of requests up to the rate."""
@@ -139,13 +140,12 @@ async def test_rate_limiter_allows_burst():
 
 # --- Fetch bootstrap ---
 
+
 @pytest.mark.asyncio
 async def test_fetch_rdap_bootstrap_uses_cache(tmp_path):
     """Should use cached bootstrap file when valid."""
     cache_file = tmp_path / "rdap_bootstrap.json"
-    bootstrap_data = {
-        "services": [[["com"], ["https://rdap.verisign.com/com/v1/"]]]
-    }
+    bootstrap_data = {"services": [[["com"], ["https://rdap.verisign.com/com/v1/"]]]}
     cache_file.write_text(json.dumps(bootstrap_data))
 
     with (
@@ -163,9 +163,7 @@ async def test_fetch_rdap_bootstrap_downloads_when_no_cache(tmp_path):
     cache_file = tmp_path / "rdap_bootstrap.json"
     cache_dir = tmp_path
 
-    bootstrap_data = {
-        "services": [[["io"], ["https://rdap.nic.io/"]]]
-    }
+    bootstrap_data = {"services": [[["io"], ["https://rdap.nic.io/"]]]}
 
     mock_response = MagicMock()
     mock_response.json.return_value = bootstrap_data
@@ -189,6 +187,7 @@ async def test_fetch_rdap_bootstrap_downloads_when_no_cache(tmp_path):
 
 
 # --- verify_available_domains ---
+
 
 @pytest.mark.asyncio
 async def test_verify_no_available_domains():

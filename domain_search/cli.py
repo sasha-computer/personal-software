@@ -4,15 +4,15 @@ import argparse
 import asyncio
 
 from rich.console import Console
-from rich.progress import Progress, BarColumn, TextColumn, MofNCompleteColumn, TimeRemainingColumn
+from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeRemainingColumn
 from rich.table import Table
 from rich.text import Text
 
-from domain_search.tld_list import fetch_tld_list
-from domain_search.dns_checker import DomainStatus, DomainResult, check_domains
+from domain_search.dns_checker import DomainResult, DomainStatus, check_domains
+from domain_search.exporter import export_results
 from domain_search.hack_generator import generate_domain_hacks
 from domain_search.rdap_checker import verify_available_domains
-from domain_search.exporter import export_results
+from domain_search.tld_list import fetch_tld_list
 
 console = Console()
 
@@ -23,7 +23,7 @@ def generate_domains(term: str, tlds: list[str]) -> list[str]:
 
 
 def sort_results(results: list[DomainResult]) -> list[DomainResult]:
-    """Sort results by availability status (available first, then unknown, then registered), then alphabetically."""
+    """Sort results by status (available, unknown, registered), then alphabetically."""
     status_order = {
         DomainStatus.AVAILABLE: 0,
         DomainStatus.UNKNOWN: 1,
@@ -146,8 +146,10 @@ def main() -> None:
         # Check for invalid TLDs and warn
         invalid_tlds = [t for t in requested_tlds if t not in tld_set]
         if invalid_tlds:
+            invalid_tlds_text = ", ".join(invalid_tlds)
             console.print(
-                f"[yellow]Warning: The following TLDs are not in the IANA list and will be skipped: {', '.join(invalid_tlds)}[/yellow]"
+                "[yellow]Warning: The following TLDs are not in the IANA list and "
+                f"will be skipped: {invalid_tlds_text}[/yellow]"
             )
 
         # Filter to only valid TLDs from the request
@@ -207,9 +209,7 @@ def main() -> None:
                 def on_rdap_result(rdap_result) -> None:
                     progress.advance(rdap_task)
 
-                results = asyncio.run(
-                    verify_available_domains(results, on_result=on_rdap_result)
-                )
+                results = asyncio.run(verify_available_domains(results, on_result=on_rdap_result))
 
     # Track check method in domain_meta for export
     for d in rdap_checked:

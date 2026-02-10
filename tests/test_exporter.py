@@ -2,12 +2,13 @@
 
 import csv
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 
 from domain_search.dns_checker import DomainResult, DomainStatus
 from domain_search.exporter import export_results
+
 from .conftest import _capture_console
 
 
@@ -92,7 +93,11 @@ class TestExportJSON:
         for row in data:
             # ISO 8601 format check - should contain 'T' and timezone info
             assert "T" in row["timestamp"]
-            assert "+" in row["timestamp"] or row["timestamp"].endswith("Z") or "+00:00" in row["timestamp"]
+            assert (
+                "+" in row["timestamp"]
+                or row["timestamp"].endswith("Z")
+                or "+00:00" in row["timestamp"]
+            )
 
     def test_export_json_default_check_method_is_dns(self, tmp_path, sample_results):
         """When no domain_meta provided, check_method defaults to DNS."""
@@ -166,6 +171,7 @@ class TestExportCSV:
         out = tmp_path / "results.csv"
         export_results(sample_results, str(out))
         reader = csv.DictReader(out.open())
+        assert reader.fieldnames is not None
         assert set(reader.fieldnames) == {"domain", "status", "check_method", "type", "timestamp"}
 
     def test_export_csv_row_count(self, tmp_path, sample_results):

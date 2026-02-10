@@ -2,8 +2,9 @@
 
 from unittest.mock import patch
 
+from domain_search.cli import STATUS_STYLES, display_results
 from domain_search.dns_checker import DomainResult, DomainStatus
-from domain_search.cli import display_results, STATUS_STYLES
+
 from .conftest import _capture_console
 
 

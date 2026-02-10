@@ -2,7 +2,7 @@
 
 import csv
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from domain_search.dns_checker import DomainResult
@@ -57,7 +57,7 @@ def _build_row(result: DomainResult, domain_meta: dict[str, dict] | None) -> dic
         FIELD_STATUS: result.status.value,
         FIELD_CHECK_METHOD: meta.get("check_method", "DNS"),
         FIELD_TYPE: meta.get("type", "exact"),
-        FIELD_TIMESTAMP: datetime.now(timezone.utc).isoformat(),
+        FIELD_TIMESTAMP: datetime.now(UTC).isoformat(),
     }
 
 

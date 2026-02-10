@@ -12,7 +12,6 @@ import httpx
 
 from domain_search.dns_checker import DomainResult, DomainStatus
 
-
 RDAP_BOOTSTRAP_URL = "https://data.iana.org/rdap/dns.json"
 RDAP_CACHE_DIR = Path.home() / ".cache" / "domain-search"
 RDAP_CACHE_FILE = RDAP_CACHE_DIR / "rdap_bootstrap.json"
@@ -238,10 +237,12 @@ async def verify_available_domains(
         rdap_results = await asyncio.gather(*tasks)
 
     for rdap_result in rdap_results:
-        updated.append(DomainResult(
-            domain=rdap_result.domain,
-            status=rdap_result.final_status,
-        ))
+        updated.append(
+            DomainResult(
+                domain=rdap_result.domain,
+                status=rdap_result.final_status,
+            )
+        )
         if on_result is not None:
             on_result(rdap_result)
 

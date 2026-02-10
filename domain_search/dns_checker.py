@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 import dns.asyncresolver
+import dns.exception
 import dns.resolver
 
 

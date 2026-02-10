@@ -1,13 +1,11 @@
 """Tests for TLD list fetching and caching."""
 
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-from datetime import datetime, timedelta, timezone
+from unittest.mock import MagicMock, patch
 
 from domain_search.tld_list import (
     _parse_tld_text,
     fetch_tld_list,
-    CACHE_MAX_AGE,
 )
 
 SAMPLE_IANA_TEXT = """\

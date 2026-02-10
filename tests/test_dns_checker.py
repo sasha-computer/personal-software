@@ -9,11 +9,11 @@ import dns.resolver
 import pytest
 
 from domain_search.dns_checker import (
+    DEFAULT_CONCURRENCY,
     DomainResult,
     DomainStatus,
     check_domain,
     check_domains,
-    DEFAULT_CONCURRENCY,
 )
 
 
