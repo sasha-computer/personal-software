@@ -26,6 +26,12 @@ AI RescueTime for Obsidian daily notes. Scans Pi coding agent sessions and gener
 
 **Stack:** Go
 
+## ⭐ [pi-themes](https://github.com/sasha-computer/pi-themes)
+
+Matching dark/light themes for pi and Ghostty that follow your system appearance. Three pairs (Catppuccin, Everforest, High Contrast) where the terminal and pi's TUI use the exact same hex values. Polls macOS appearance and switches both automatically.
+
+**Stack:** TypeScript · pi extension
+
 ## ⭐ [pi-fzf](https://github.com/sasha-computer/pi-fzf)
 
 Fuzzy find and resume Pi coding agent sessions. Indexes every message — yours and Pi's — across all sessions so you can find that thing you worked on three days ago by typing a few words you remember.
