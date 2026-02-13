@@ -28,9 +28,9 @@ AI RescueTime for Obsidian daily notes. Scans Pi coding agent sessions and gener
 
 ## ⭐ [pi-fzf](https://github.com/sasha-computer/pi-fzf)
 
-Fuzzy find and resume Pi coding agent sessions. Indexes every message you've sent across every session so you can find that thing you worked on three days ago by typing a few words you remember saying.
+Fuzzy find and resume Pi coding agent sessions. Indexes every message — yours and Pi's — across all sessions so you can find that thing you worked on three days ago by typing a few words you remember.
 
-**Stack:** Go
+**Stack:** Python · uv · fzf
 
 ## ⭐ [pif](https://github.com/sasha-computer/pif)
 
