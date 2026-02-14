@@ -2,9 +2,9 @@
 
 Small tools I built for myself and actually use. Things graduate here from [experiments](https://github.com/sasha-computer/experiments) once they're useful enough to keep around.
 
-## ⭐ [ccusage](https://github.com/sasha-computer/ccusage)
+## ⭐ [claude-code-usage](https://github.com/sasha-computer/claude-code-usage)
 
-Minimal macOS menu bar app that shows real-time Claude Code usage — tokens, cost, and session stats at a glance. Lives in the menu bar, stays out of the way.
+See your Claude Code rate limits in the macOS menu bar. Shows 5-hour and weekly usage percentages, color-coded so you know at a glance how close you are. Forked from NewTurn2017/ccusage and actively maintained with English support and a token refresh fix.
 
 **Stack:** Swift · macOS 14+
 
