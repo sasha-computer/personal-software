@@ -44,6 +44,12 @@ Run a command. If it fails, send the output to Pi for help. That's it.
 
 **Stack:** Python · uv
 
+## ⭐ [readwise-triage](https://github.com/sasha-computer/readwise-triage)
+
+Tinder for your Readwise Reader inbox. Syncs your library to a local SQLite database, then shows articles one at a time as swipeable cards. Left to archive, right to keep. Down arrow gets an AI summary so you can decide without opening the article. Burns through a backlog of 200+ articles in a few minutes.
+
+**Stack:** TypeScript · Bun · SQLite · OpenRouter
+
 ## ⭐ [plain-text-running-tracker](https://github.com/sasha-computer/plain-text-running-tracker)
 
 I wanted my running data in a format I actually own. This parses Apple Health XML exports and Garmin FIT files into a single markdown file — every run with date, distance, duration, pace, and heart rate. No cloud accounts, no subscriptions, just a `.md` file I can read, search, and version control. Plain text is forever.
