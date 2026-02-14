@@ -62,6 +62,12 @@ RuneLite plugin that tracks firemaking session stats. XP, logs burned, time elap
 
 **Stack:** Java · RuneLite
 
+## ⭐ [sidebar](https://github.com/sasha-computer/sidebar)
+
+Permanent macOS desktop sidebar pinned to the right edge of a widescreen monitor. Shows calendar, Todoist tasks, Spotify now playing, clipboard history, system stats, downloads, screenshots, and a quick note input. Built as a Svelte + Tailwind app inside a Hammerspoon webview. Auto-hides when undocked.
+
+**Stack:** Svelte 5 · Tailwind v4 · Hammerspoon · Lua · Bun
+
 ## ⭐ [tinyclaw](https://github.com/sasha-computer/tinyclaw)
 
 Tiny wrapper around Claude Code that turns it into a 24/7 personal AI agent. Uses a file-based queue so other services (WhatsApp, Telegram, etc.) can send messages and get responses back.
