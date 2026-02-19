@@ -38,6 +38,12 @@ Fuzzy find and resume Pi coding agent sessions. Indexes every message — yours 
 
 **Stack:** Python · uv · fzf
 
+## ⭐ [pie-thinking-timer](https://github.com/sasha-computer/pie-thinking-timer)
+
+Minimal pi extension that shows a live timer on collapsed thinking blocks. See how long the model has been thinking at a glance.
+
+**Stack:** TypeScript · pi extension
+
 ## ⭐ [pi-auto-summary](https://github.com/sasha-computer/pi-auto-summary)
 
 Auto-save structured session logs when exiting pi. If the session was substantial (5+ exchanges), offers to generate a summary and save it as a markdown log. Auto-commits to git if you're in a repo.
