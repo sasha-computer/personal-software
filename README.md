@@ -97,3 +97,9 @@ Tiny wrapper around Claude Code that turns it into a 24/7 personal AI agent. Use
 Search your X/Twitter likes with fzf. Indexes your liked tweets in SQLite with full-text search so you can actually find that tweet you liked six months ago.
 
 **Stack:** Python · SQLite · fzf
+
+## ⭐ [ai-font-generation](https://github.com/sasha-computer/ai-font-generation)
+
+Convert proportional fonts to monospaced using fontTools. Built Bookerly Mono by uniformly scaling and centering every glyph into a 600-unit mono cell. Decomposes composites first to avoid offset confusion.
+
+**Stack:** Python · fontTools · uv
